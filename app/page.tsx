@@ -46,6 +46,9 @@ export default function HomePage() {
             }
 
             const data = await response.json();
+            if (data.gift) {
+                window.localStorage.setItem(`little-world-gift-${data.id}`, JSON.stringify(data.gift));
+            }
             router.push(`/gift/${data.id}`);
         } catch (err) {
             setError((err as Error).message);

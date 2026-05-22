@@ -102,7 +102,7 @@ export async function POST(request: Request) {
         };
 
         await saveGift(gift);
-        return NextResponse.json({ id });
+        return NextResponse.json({ id, gift });
     } catch (error) {
         const fallback = fallbackGift();
         const id = crypto.randomUUID().slice(0, 8);
@@ -123,6 +123,6 @@ export async function POST(request: Request) {
             createdAt: new Date().toISOString()
         };
         await saveGift(gift);
-        return NextResponse.json({ id });
+        return NextResponse.json({ id, gift });
     }
 }
