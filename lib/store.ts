@@ -1,35 +1,40 @@
 import type { Gift } from '@/types/gift';
 
-const kvUrl = process.env.KV_REST_API_URL;
-const kvToken = process.env.KV_REST_API_TOKEN;
-const hasKv = Boolean(kvUrl && kvToken);
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const hasSupabase = Boolean(supabaseUrl && supabaseKey);
 const memoryStore = new Map<string, Gift>();
 
-async function kvFetch(path: string, init: RequestInit) {
-    if (!kvUrl || !kvToken) {
-        throw new Error('Vercel KV is not configured');
+async function supabaseFetch(path: string, init: RequestInit) {
+    if (!supabaseUrl || !supabaseKey) {
+        throw new Error('Supabase is not configured');
     }
 
-    const url = `${kvUrl.replace(/\/$/, '')}/${path}`;
+    const url = `${supabaseUrl.replace(/\/$/, '')}${path}`;
     const response = await fetch(url, {
         ...init,
         headers: {
             ...(init.headers ?? {}),
-            Authorization: `Bearer ${kvToken}`
+            apikey: supabaseKey,
+            Authorization: `Bearer ${supabaseKey}`
         }
     });
 
     if (!response.ok) {
-        throw new Error(`KV request failed: ${response.statusText}`);
+        throw new Error(`Supabase request failed: ${response.statusText}`);
     }
 
     return response;
 }
 
 export async function saveGift(gift: Gift) {
-    if (hasKv) {
-        await kvFetch(encodeURIComponent(gift.id), {
-            method: 'PUT',
+    if (hasSupabase) {
+        await supabaseFetch('/rest/v1/gifts', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Prefer: 'return=representation'
+            },
             body: JSON.stringify(gift)
         });
         return gift;
@@ -45,10 +50,14 @@ export async function saveGift(gift: Gift) {
 }
 
 export async function getGift(id: string) {
-    if (hasKv) {
+    if (hasSupabase) {
         try {
-            const response = await kvFetch(encodeURIComponent(id), { method: 'GET' });
-            return (await response.json()) as Gift;
+            const response = await supabaseFetch(
+                `/rest/v1/gifts?id=eq.${encodeURIComponent(id)}&select=*`,
+                { method: 'GET' }
+            );
+            const data = (await response.json()) as Gift[];
+            return data.length > 0 ? data[0] : null;
         } catch {
             return null;
         }
