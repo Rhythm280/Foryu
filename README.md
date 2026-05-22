@@ -1,4 +1,4 @@
-# A Little World for You
+# Foryu
 
 A romantic, AI-powered gift page built with Next.js 14, TypeScript, Tailwind CSS, Framer Motion, and Anthropic Claude.
 

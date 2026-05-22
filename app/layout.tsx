@@ -3,11 +3,11 @@ import type { ReactNode } from 'react';
 import './globals.css';
 
 export const metadata: Metadata = {
-    title: 'A Little World for You',
-    description: 'A romantic AI gift page with a personalized poem, art, and message.',
+    title: 'Foryu',
+    description: 'A romantic AI gift page with a personalized poem and message.',
     metadataBase: new URL('https://example.com'),
     openGraph: {
-        title: 'A Little World for You',
+        title: 'Foryu',
         description: 'Create a heartfelt shareable gift with custom poetry and art.',
         type: 'website'
     }
